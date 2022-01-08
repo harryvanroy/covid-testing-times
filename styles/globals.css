@@ -14,3 +14,12 @@ a {
 * {
   box-sizing: border-box;
 }
+
+.map {
+  height: 100%;
+  width: 100%;
+}
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+}
