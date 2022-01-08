@@ -5,37 +5,57 @@ import {
   Flex,
   Button,
   Divider,
-  Spinner,
   Heading,
   VStack,
+  Text,
+  Spinner,
 } from "@chakra-ui/react";
-import { SearchIcon } from "@chakra-ui/icons";
+import { AddIcon, SearchIcon } from "@chakra-ui/icons";
 import { useLocation } from "../context/LocationContext";
 import { Clinic } from "./Clinic";
 
 export const Sidebar = () => {
-  const { clinics, location } = useLocation();
+  const { clinics, getClinics, loading } = useLocation();
 
   return (
     <Flex direction="column" height="100%">
-      <Flex h="100px" alignItems="center" justifyContent="center">
-        <Heading size="lg">COVID-19 Testing Times 🦠🧪</Heading>
+      <Flex
+        h="100px"
+        alignItems="center"
+        justifyContent="center"
+        direction="column"
+      >
+        <Heading size="lg">🧪 COVID-19 Testing Times</Heading>
       </Flex>
       <Divider my="3px" />
       <Flex p="6px" justifyContent="center">
-        <Button leftIcon={<SearchIcon />} colorScheme="teal" variant="solid">
-          Search area
-        </Button>
         <Flex alignItems="center" justifyContent="center" p="10px">
-          <Heading size="sm">Testing clinics</Heading>
+          <Button
+            leftIcon={<SearchIcon />}
+            colorScheme="teal"
+            variant="solid"
+            onClick={getClinics}
+            mx="3px"
+          >
+            Search area
+          </Button>
+          <Button leftIcon={<AddIcon />} mx="3px" colorScheme="blue">
+            Add Waiting Time
+          </Button>
+        </Flex>
+      </Flex>
+      <Divider my="3px" />
+      <Flex p="6px" justifyContent="center">
+        <Flex alignItems="center" justifyContent="center" p="10px">
+          <Heading size="md">🏥 Current Testing Clinics</Heading>
         </Flex>
       </Flex>
       <Divider my="3px" />
       <VStack flex="1" p="6px" overflow="scroll">
-        {clinics?.length ? (
+        {!loading ? (
           clinics.map((clinic) => <Clinic key={clinic.id} clinic={clinic} />)
         ) : (
-          <Spinner mx="auto" />
+          <Spinner />
         )}
       </VStack>
     </Flex>

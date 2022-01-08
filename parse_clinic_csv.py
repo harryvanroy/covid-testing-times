@@ -16,7 +16,7 @@ def main():
     clinics = pd.read_csv(url).to_dict("records")
 
     db = initialise_firebase()
-    for clinic in clinics[:10]:
+    for clinic in clinics:
         clean_data = {k: clinic[k] for k in clinic if not pd.isna(clinic[k])}
         clean_data["name"] = clean_data.pop("Facility Name ", None)
         clean_data["latitude"] = clean_data.pop("Latitude", None)

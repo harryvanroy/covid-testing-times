@@ -13,7 +13,7 @@ const Home: NextPage = () => {
       <Box height="100%" width="100%">
         <Map />
       </Box>
-      <Box width="600px">
+      <Box width="500px" minW="500px">
         <Sidebar />
       </Box>
     </Flex>

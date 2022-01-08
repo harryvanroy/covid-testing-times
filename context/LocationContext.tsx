@@ -5,16 +5,27 @@ import React, {
   ReactNode,
   useEffect,
 } from "react";
-import { collection, DocumentData, getDocs } from "firebase/firestore";
+import {
+  collection,
+  DocumentData,
+  getDocs,
+  query,
+  limit,
+  orderBy,
+  startAt,
+  endAt,
+} from "firebase/firestore";
 import { database } from "../firebase";
-
+import { geohashQueryBounds, distanceBetween } from "geofire-common";
 interface LocationContextType {
   location: {
     lat: number;
     lng: number;
   };
   clinics: Array<DocumentData>;
+  loading: boolean;
   updateLocation: (location: any) => void;
+  getClinics: () => void;
 }
 
 const LocationContext = createContext<LocationContextType>(
@@ -32,55 +43,10 @@ export const LocationProvider = ({ children }: LocationProviderProps) => {
   });
 
   const [clinics, setClinics] = useState<Array<DocumentData>>([]);
+  const [loading, setLoading] = useState(false);
+  const radiusInM = 50 * 1000;
 
   useEffect(() => {
-    const getClinics = async () => {
-      const querySnapshot = await getDocs(collection(database, "clinics"));
-      querySnapshot.forEach((clinic) => {
-        setClinics((clinics) => [
-          ...clinics,
-          { ...clinic.data(), id: clinic.id },
-        ]);
-      });
-      /* setClinics([
-        {
-          id: "asdfasdfasdf",
-          address: "Ground Floor, 102 Bolsover St, Rockhampton, 4700",
-          bookingNeeded: "Yes",
-          hours: "15:00-17:00 M-F, By appointment only on Sat 10:00-13:00.",
-          howToFind: "Rock Building",
-          isDriveThrough: "No",
-          isRAT: "No",
-          latitude: -23.375337,
-          link: "https://www.snp.com.au/",
-          longitude: 150.5093965,
-          name: "Sullivan Nicolaides - Rockhampton",
-          pathology: "Sullivan Nicolaides",
-          phone: "4923 9840",
-          postCode: 4700,
-          referralNeeded: "No",
-          type: "Private",
-        },
-        {
-          id: "1234123",
-          address: "Cnr Elliott St and Mills Ave, Moranbah, 4744",
-          bookingNeeded: "No",
-          hours:
-            "Monday- Friday 0900-1200 | Otherwise call hospital outside these hours for instructions for testing.",
-          howToFind: "Mill street entrance",
-          isDriveThrough: "No",
-          latitude: -22.0014615,
-          longitude: 148.0545849,
-          name: "Moranbah Hospital",
-          pathology: "Pathology Queensland",
-          phone: "07 4941 4644",
-          postCode: 4744,
-          referralNeeded: "No",
-          type: "Fever",
-        },
-      ]); */
-    };
-
     navigator.geolocation.getCurrentPosition((position) => {
       setLocation({
         lat: position.coords.latitude,
@@ -95,10 +61,61 @@ export const LocationProvider = ({ children }: LocationProviderProps) => {
     setLocation(location);
   };
 
+  const getClinics = async () => {
+    setLoading(true);
+    const bounds = geohashQueryBounds([location.lat, location.lng], radiusInM);
+
+    const promises = [];
+    for (const b of bounds) {
+      const clinicsRef = collection(database, "clinics");
+      const q = query(
+        clinicsRef,
+        orderBy("geohash", "asc"),
+        startAt(b[0]),
+        endAt(b[1])
+      );
+      promises.push(getDocs(q));
+    }
+
+    Promise.all(promises)
+      .then((snapshots) => {
+        const matchingDocs = [];
+
+        for (const snap of snapshots) {
+          for (const doc of snap.docs) {
+            const lat = doc.get("latitude");
+            const lng = doc.get("longitude");
+            const distanceInKm = distanceBetween(
+              [lat, lng],
+              [location.lat, location.lng]
+            );
+            const distanceInM = distanceInKm * 1000;
+            if (distanceInM <= radiusInM) {
+              matchingDocs.push({ data: doc, distanceInKm });
+            }
+          }
+        }
+
+        return matchingDocs;
+      })
+      .then((docs) => {
+        const cleanDocs = docs.map((doc) => ({
+          ...doc.data.data(),
+          id: doc.data.id,
+          distance: doc.distanceInKm,
+        }));
+        cleanDocs.sort((a, b) => (a.distance > b.distance ? 1 : -1));
+        setClinics(cleanDocs);
+        setLoading(false);
+      });
+  };
+
   const value = {
     location,
     clinics,
+    loading,
     updateLocation,
+    getClinics,
   };
 
   return (
