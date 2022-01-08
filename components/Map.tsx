@@ -1,7 +1,6 @@
 import {
   MapContainer,
   TileLayer,
-  useMap,
   Marker,
   Popup,
   useMapEvents,
@@ -10,6 +9,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 import "leaflet-defaulticon-compatibility";
 import { useLocation } from "../context/LocationContext";
+import { Clinic } from "../components/Clinic";
 
 interface ChangeMapViewProps {
   location: {
@@ -23,6 +23,9 @@ const ChangeMapView = ({ location }: ChangeMapViewProps) => {
 
   const map = useMapEvents({
     dragend: (e) => {
+      updateLocation(e.target.getCenter());
+    },
+    zoomend: (e) => {
       updateLocation(e.target.getCenter());
     },
   });
@@ -56,7 +59,9 @@ const Map = () => {
                 title={clinic.name}
                 position={[clinic.latitude, clinic.longitude]}
               >
-                <Popup>{clinic.name}</Popup>
+                <Popup>
+                  <Clinic clinic={clinic} isSideBar={false} />
+                </Popup>
               </Marker>
             );
           })}

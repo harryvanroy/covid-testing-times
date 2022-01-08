@@ -53,7 +53,9 @@ export const Sidebar = () => {
       <Divider my="3px" />
       <VStack flex="1" p="6px" overflow="scroll">
         {!loading ? (
-          clinics.map((clinic) => <Clinic key={clinic.id} clinic={clinic} />)
+          clinics.map((clinic) => (
+            <Clinic key={clinic.id} clinic={clinic} isSideBar={true} />
+          ))
         ) : (
           <Spinner />
         )}

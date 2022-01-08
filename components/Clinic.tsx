@@ -1,4 +1,5 @@
 import React from "react";
+import styles from "./Clinic.module.css";
 import {
   Box,
   Tag,
@@ -8,14 +9,18 @@ import {
   List,
   ListItem,
   ListIcon,
-  chakra,
 } from "@chakra-ui/react";
 import { PhoneIcon, Search2Icon, TimeIcon } from "@chakra-ui/icons";
 
 import { DocumentData } from "firebase/firestore";
 import { useLocation } from "../context/LocationContext";
 
-export const Clinic = ({ clinic }: DocumentData) => {
+interface ClinicProps {
+  clinic: DocumentData;
+  isSideBar: boolean;
+}
+
+export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
   const { updateLocation } = useLocation();
 
   const handleClick = () => {
@@ -25,8 +30,18 @@ export const Clinic = ({ clinic }: DocumentData) => {
     });
   };
   return (
-    <Box borderWidth="1px" width="100%" p="6px" onClick={handleClick}>
-      <Heading size="h6">{clinic.name}</Heading>
+    <Box
+      className={isSideBar ? styles.clinicBox : ""}
+      borderWidth="1px"
+      width="100%"
+      p="6px"
+      onClick={handleClick}
+    >
+      <Heading size="h6">
+        <a href={clinic.link} target="_blank" rel="noreferrer">
+          {clinic.name}
+        </a>
+      </Heading>
       <Box>
         <List spacing={0}>
           {clinic?.phone ? (
@@ -45,6 +60,17 @@ export const Clinic = ({ clinic }: DocumentData) => {
             <ListItem>
               <ListIcon as={TimeIcon} color="grey" />
               {clinic.hours}
+            </ListItem>
+          ) : null}
+          {clinic?.type ? (
+            <ListItem>
+              <b>Clinic type:</b> {clinic.type}
+            </ListItem>
+          ) : null}
+
+          {clinic?.pathology ? (
+            <ListItem>
+              <b>Pathology service:</b> {clinic.pathology}
             </ListItem>
           ) : null}
         </List>

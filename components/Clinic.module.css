@@ -1,0 +1,4 @@
+.clinicBox:hover {
+  cursor: pointer;
+  border-width: 4px;
+}
