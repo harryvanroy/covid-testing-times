@@ -22,7 +22,7 @@ export const Sidebar = ({ setViewMap, viewMap }: SideBarProps) => {
   const { clinics, getClinics, loading } = useLocation();
 
   return (
-    <Flex direction="column" height="100%">
+    <Flex direction="column" height="100%" width="100%">
       <Flex
         h="100px"
         alignItems="center"

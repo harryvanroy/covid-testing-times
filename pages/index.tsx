@@ -21,7 +21,7 @@ const Home: NextPage = () => {
         <Map setViewMap={setViewMap} viewMap={viewMap} />
       </Box>
       <Box
-        width={{ base: viewMap ? "0px" : "100%", md: "500px" }}
+        width={{ base: viewMap ? "0px" : "100%", md: "600px" }}
         display={{ base: viewMap ? "none" : "block", md: "block" }}
       >
         <Sidebar setViewMap={setViewMap} viewMap={viewMap} />
