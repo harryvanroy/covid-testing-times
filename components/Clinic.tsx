@@ -9,11 +9,14 @@ import {
   List,
   ListItem,
   ListIcon,
+  Button,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { PhoneIcon, Search2Icon, TimeIcon } from "@chakra-ui/icons";
-
+import { PhoneIcon, Search2Icon, TimeIcon, AddIcon } from "@chakra-ui/icons";
+import { WaitingTimeForm } from "./WaitingTimeForm";
 import { DocumentData } from "firebase/firestore";
 import { useLocation } from "../context/LocationContext";
+import { WaitingTimes } from "./WaitingTimes";
 
 interface ClinicProps {
   clinic: DocumentData;
@@ -22,6 +25,12 @@ interface ClinicProps {
 
 export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
   const { updateLocation } = useLocation();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenTimes,
+    onOpen: onOpenTimes,
+    onClose: onCloseTimes,
+  } = useDisclosure();
 
   const handleClick = () => {
     updateLocation({
@@ -42,7 +51,7 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
           {clinic.name}
         </a>
       </Heading>
-      <Box>
+      <Box mb="10px">
         <List spacing={0}>
           {clinic?.phone ? (
             <ListItem>
@@ -67,14 +76,21 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
               <b>Clinic type:</b> {clinic.type}
             </ListItem>
           ) : null}
-
-          {clinic?.pathology ? (
-            <ListItem>
-              <b>Pathology service:</b> {clinic.pathology}
-            </ListItem>
-          ) : null}
         </List>
       </Box>
+      <HStack spacing="10px">
+        <Button colorScheme="blue" size="xs" onClick={onOpenTimes}>
+          Check Waiting Times
+        </Button>
+        <Button
+          leftIcon={<AddIcon />}
+          colorScheme="blue"
+          size="xs"
+          onClick={onOpen}
+        >
+          Add Waiting Time
+        </Button>
+      </HStack>
       <Divider my="6px" />
       <HStack spacing="4px">
         {clinic?.isDriveThrough === "Yes" ? (
@@ -99,6 +115,12 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
           </Tag>
         ) : null}
       </HStack>
+      <WaitingTimeForm isOpen={isOpen} onClose={onClose} clinic={clinic} />
+      <WaitingTimes
+        isOpen={isOpenTimes}
+        onClose={onCloseTimes}
+        clinic={clinic}
+      />
     </Box>
   );
 };

@@ -32,15 +32,12 @@ export const Sidebar = () => {
         <Flex alignItems="center" justifyContent="center" p="10px">
           <Button
             leftIcon={<SearchIcon />}
-            colorScheme="teal"
+            colorScheme="blue"
             variant="solid"
             onClick={getClinics}
             mx="3px"
           >
             Search area
-          </Button>
-          <Button leftIcon={<AddIcon />} mx="3px" colorScheme="blue">
-            Add Waiting Time
           </Button>
         </Flex>
       </Flex>
