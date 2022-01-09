@@ -43,8 +43,10 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
   };
 
   const handleAddWaitingTime = async () => {
-    await loginWithGoogle();
-    onOpen();
+    try {
+      await loginWithGoogle();
+      onOpen();
+    } catch {}
   };
 
   const loginWithGoogle = () => {

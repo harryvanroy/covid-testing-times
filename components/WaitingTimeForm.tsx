@@ -19,7 +19,9 @@ import {
   NumberDecrementStepper,
   Spinner,
   Flex,
+  Alert,
 } from "@chakra-ui/react";
+import { AlertIcon } from "@chakra-ui/react";
 import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
 import { database } from "../firebase";
 import { DocumentData } from "firebase/firestore";
@@ -53,11 +55,21 @@ export const WaitingTimeForm = ({
       where("email", "==", user?.email)
     );
     const querySnapshot = await getDocs(q);
+
+    const oneDay = 24 * 60 * 60 * 1000;
+
+    let canSubmit = true;
     querySnapshot.forEach((doc) => {
-      if (doc.data().currentTime.toDate()) {
+      if (Date.now() - doc.data().currentTime.toDate() < oneDay) {
         setError("You have submitted a waiting time for this clinic recently.");
+        canSubmit = false;
       }
     });
+
+    if (!canSubmit) {
+      setLoading(false);
+      return;
+    }
 
     const docRef = await addDoc(
       collection(database, "clinics", clinic.id, "waitingTimes"),
@@ -78,6 +90,12 @@ export const WaitingTimeForm = ({
       <ModalContent>
         <ModalHeader>Add Waiting Time</ModalHeader>
         <ModalCloseButton />
+        {error ? (
+          <Alert status="error">
+            {error}
+            <AlertIcon />
+          </Alert>
+        ) : null}
         <ModalBody>
           {loading ? (
             <Flex justifyContent="center" alignItems="center">
