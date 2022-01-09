@@ -20,7 +20,7 @@ import {
   Spinner,
   Flex,
 } from "@chakra-ui/react";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import { collection, addDoc, getDocs, where, query } from "firebase/firestore";
 import { database } from "../firebase";
 import { DocumentData } from "firebase/firestore";
 import { User } from "firebase/auth";
@@ -41,17 +41,22 @@ export const WaitingTimeForm = ({
   const [waitingTime, setWaitingTime] = useState(0);
   const [startingTime, setStartingTime] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit: React.FormEventHandler = async (e) => {
     e.preventDefault();
 
     setLoading(true);
 
-    const querySnapshot = await getDocs(
-      collection(database, "clinics", clinic.id, "waitingTimes")
+    const q = query(
+      collection(database, "clinics", clinic.id, "waitingTimes"),
+      where("email", "==", user?.email)
     );
+    const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      console.log(doc);
+      if (doc.data().currentTime.toDate()) {
+        setError("You have submitted a waiting time for this clinic recently.");
+      }
     });
 
     const docRef = await addDoc(
