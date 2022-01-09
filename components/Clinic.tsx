@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./Clinic.module.css";
 import {
   Box,
@@ -14,6 +14,8 @@ import {
 } from "@chakra-ui/react";
 import { PhoneIcon, Search2Icon, TimeIcon, AddIcon } from "@chakra-ui/icons";
 import { WaitingTimeForm } from "./WaitingTimeForm";
+import { auth } from "../firebase";
+import { User, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { DocumentData } from "firebase/firestore";
 import { useLocation } from "../context/LocationContext";
 import { WaitingTimes } from "./WaitingTimes";
@@ -31,6 +33,7 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
     onOpen: onOpenTimes,
     onClose: onCloseTimes,
   } = useDisclosure();
+  const [user, setUser] = useState<User>();
 
   const handleClick = () => {
     updateLocation({
@@ -38,6 +41,25 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
       lng: clinic.longitude,
     });
   };
+
+  const handleAddWaitingTime = async () => {
+    await loginWithGoogle();
+    onOpen();
+  };
+
+  const loginWithGoogle = () => {
+    const provider = new GoogleAuthProvider();
+    return signInWithPopup(auth, provider);
+  };
+
+  useEffect(() => {
+    return auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+      }
+    });
+  }, []);
+
   return (
     <Box
       className={isSideBar ? styles.clinicBox : ""}
@@ -86,7 +108,7 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
           leftIcon={<AddIcon />}
           colorScheme="blue"
           size="xs"
-          onClick={onOpen}
+          onClick={handleAddWaitingTime}
         >
           Add Waiting Time
         </Button>
@@ -115,7 +137,12 @@ export const Clinic = ({ clinic, isSideBar }: ClinicProps) => {
           </Tag>
         ) : null}
       </HStack>
-      <WaitingTimeForm isOpen={isOpen} onClose={onClose} clinic={clinic} />
+      <WaitingTimeForm
+        isOpen={isOpen}
+        onClose={onClose}
+        clinic={clinic}
+        user={user}
+      />
       <WaitingTimes
         isOpen={isOpenTimes}
         onClose={onCloseTimes}

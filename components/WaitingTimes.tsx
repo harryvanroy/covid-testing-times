@@ -19,7 +19,7 @@ import {
   Tag,
   Divider,
 } from "@chakra-ui/react";
-import { collection, addDoc, doc, getDocs } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { database } from "../firebase";
 import { DocumentData } from "firebase/firestore";
 

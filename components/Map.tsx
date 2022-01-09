@@ -10,6 +10,8 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 import { useLocation } from "../context/LocationContext";
 import { Clinic } from "../components/Clinic";
+import { Button, Box } from "@chakra-ui/react";
+import { HamburgerIcon, SearchIcon } from "@chakra-ui/icons";
 
 interface ChangeMapViewProps {
   location: {
@@ -33,8 +35,18 @@ const ChangeMapView = ({ location }: ChangeMapViewProps) => {
   return null;
 };
 
-const Map = () => {
-  const { clinics, location } = useLocation();
+interface MapProps {
+  setViewMap: (viewMap: boolean) => void;
+  viewMap: boolean;
+}
+
+const Map = ({ setViewMap, viewMap }: MapProps) => {
+  const { clinics, location, getClinics } = useLocation();
+
+  const handleClick = () => {
+    getClinics();
+    setViewMap(!viewMap);
+  };
 
   return (
     <>
@@ -48,6 +60,16 @@ const Map = () => {
           ]}
         >
           <ChangeMapView location={location} />
+          <Button
+            leftIcon={<SearchIcon />}
+            colorScheme="blue"
+            variant="solid"
+            onClick={handleClick}
+            mx="3px"
+            sx={{ zIndex: 2000, float: "right", margin: "10px" }}
+          >
+            Search area
+          </Button>
           <TileLayer
             url={`https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}@2x?access_token=${process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN}`}
             attribution='Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery &copy; <a href="https://www.mapbox.com/">Mapbox</a>'

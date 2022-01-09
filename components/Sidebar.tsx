@@ -10,11 +10,15 @@ import {
   Text,
   Spinner,
 } from "@chakra-ui/react";
-import { AddIcon, SearchIcon } from "@chakra-ui/icons";
+import { SearchIcon } from "@chakra-ui/icons";
 import { useLocation } from "../context/LocationContext";
 import { Clinic } from "./Clinic";
 
-export const Sidebar = () => {
+interface SideBarProps {
+  setViewMap: (viewMap: boolean) => void;
+  viewMap: boolean;
+}
+export const Sidebar = ({ setViewMap, viewMap }: SideBarProps) => {
   const { clinics, getClinics, loading } = useLocation();
 
   return (
@@ -28,20 +32,18 @@ export const Sidebar = () => {
         <Heading size="lg">🧪 COVID-19 Testing Times</Heading>
       </Flex>
       <Divider my="3px" />
-      <Flex p="6px" justifyContent="center">
-        <Flex alignItems="center" justifyContent="center" p="10px">
-          <Button
-            leftIcon={<SearchIcon />}
-            colorScheme="blue"
-            variant="solid"
-            onClick={getClinics}
-            mx="3px"
-          >
-            Search area
-          </Button>
-        </Flex>
-      </Flex>
-      <Divider my="3px" />
+      {!viewMap ? (
+        <Button
+          leftIcon={<SearchIcon />}
+          colorScheme="blue"
+          variant="solid"
+          onClick={() => setViewMap(!viewMap)}
+          display={{ base: "block", md: "none" }}
+          mx="3px"
+        >
+          View Map
+        </Button>
+      ) : null}
       <Flex p="6px" justifyContent="center">
         <Flex alignItems="center" justifyContent="center" p="10px">
           <Heading size="md">🏥 Current Testing Clinics</Heading>

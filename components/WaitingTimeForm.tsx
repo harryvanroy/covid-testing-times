@@ -20,20 +20,23 @@ import {
   Spinner,
   Flex,
 } from "@chakra-ui/react";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 import { database } from "../firebase";
 import { DocumentData } from "firebase/firestore";
+import { User } from "firebase/auth";
 
 interface WaitingTimeFormProps {
   clinic: DocumentData;
   isOpen: boolean;
   onClose: () => void;
+  user: User | undefined;
 }
 
 export const WaitingTimeForm = ({
   clinic,
   isOpen,
   onClose,
+  user,
 }: WaitingTimeFormProps) => {
   const [waitingTime, setWaitingTime] = useState(0);
   const [startingTime, setStartingTime] = useState("");
@@ -41,13 +44,23 @@ export const WaitingTimeForm = ({
 
   const handleSubmit: React.FormEventHandler = async (e) => {
     e.preventDefault();
+
     setLoading(true);
+
+    const querySnapshot = await getDocs(
+      collection(database, "clinics", clinic.id, "waitingTimes")
+    );
+    querySnapshot.forEach((doc) => {
+      console.log(doc);
+    });
+
     const docRef = await addDoc(
       collection(database, "clinics", clinic.id, "waitingTimes"),
       {
         waitingTime,
         startingTime,
         currentTime: new Date(),
+        email: user?.email,
       }
     );
     setLoading(false);
@@ -79,6 +92,7 @@ export const WaitingTimeForm = ({
                 <FormLabel>Time in Queue (mins)</FormLabel>
                 <NumberInput
                   min={0}
+                  max={720}
                   onChange={(v) => setWaitingTime(parseInt(v))}
                 >
                   <NumberInputField />
@@ -88,15 +102,19 @@ export const WaitingTimeForm = ({
                   </NumberInputStepper>
                 </NumberInput>
               </FormControl>
-              <Button
-                variant="solid"
-                colorScheme="blue"
-                type="submit"
-                mt="8px"
-                sx={{ float: "right" }}
-              >
-                Submit
-              </Button>
+              {user ? (
+                <Button
+                  variant="solid"
+                  colorScheme="blue"
+                  type="submit"
+                  mt="8px"
+                  sx={{ float: "right" }}
+                >
+                  Submit
+                </Button>
+              ) : (
+                <Text>Not authenticated with Google</Text>
+              )}
             </form>
           )}
         </ModalBody>
