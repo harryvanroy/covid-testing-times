@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Covid Testing Times App 
+
+Web application to view COVID-19 testing clinics in your area, as well as recent waiting times at those clinics. Waiting times are provided by other users of the app.
 
 ## Getting Started
 
