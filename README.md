@@ -2,6 +2,9 @@
 
 Web application to view COVID-19 testing clinics in your area, as well as recent waiting times at those clinics. Waiting times are provided by other users of the app.
 
+## Screenshots
+
+
 ## Getting Started
 
 First, run the development server:
