@@ -4,7 +4,7 @@ Web application to view COVID-19 testing clinics in your area, as well as recent
 
 ## Screenshots
 
-
+![image](https://user-images.githubusercontent.com/43164280/150749881-c55f3f60-015f-484d-a6e5-f375ea132ac3.png)
 ## Getting Started
 
 First, run the development server:
